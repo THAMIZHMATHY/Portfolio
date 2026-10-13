@@ -1,6 +1,6 @@
 // Typing Effect
 const typingText = document.getElementById('typing-text');
-const words = ['Web Developer', 'Electronics Engineer', 'Data Analyst', 'Problem Solver'];
+const words = ['modern web apps', 'full-stack solutions', 'beautiful interfaces', 'scalable systems'];
 let wordIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -11,20 +11,20 @@ function type() {
     if (isDeleting) {
         typingText.textContent = currentWord.substring(0, charIndex - 1);
         charIndex--;
-        typeSpeed = 50;
+        typeSpeed = 40;
     } else {
         typingText.textContent = currentWord.substring(0, charIndex + 1);
         charIndex++;
-        typeSpeed = 150;
+        typeSpeed = 120;
     }
 
     if (!isDeleting && charIndex === currentWord.length) {
         isDeleting = true;
-        typeSpeed = 2000; // Pause at end
+        typeSpeed = 2000;
     } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         wordIndex = (wordIndex + 1) % words.length;
-        typeSpeed = 500;
+        typeSpeed = 400;
     }
 
     setTimeout(type, typeSpeed);
@@ -36,18 +36,16 @@ const sections = document.querySelectorAll('section');
 const navItems = document.querySelectorAll('.nav-links a');
 
 window.addEventListener('scroll', () => {
-    // Scroll background effect
     if (window.scrollY > 50) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
     }
 
-    // Active link highlighting (Scroll Spy)
+    // Active link highlighting
     let current = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
         if (pageYOffset >= sectionTop - 150) {
             current = section.getAttribute('id');
         }
@@ -61,31 +59,42 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Reveal on Scroll
-const revealElements = document.querySelectorAll('.reveal, .stat-card, .skill-category, .timeline-item, .project-card');
+// Staggered Reveal on Scroll
+const revealElements = document.querySelectorAll(
+    '.reveal, .stat-card, .skill-category, .timeline-item, .project-card, .contact-item, .info-item'
+);
 
 const revealOnScroll = () => {
-    const triggerBottom = window.innerHeight * 0.85;
+    const triggerBottom = window.innerHeight * 0.88;
 
-    revealElements.forEach(el => {
+    revealElements.forEach((el, index) => {
         const elTop = el.getBoundingClientRect().top;
         if (elTop < triggerBottom) {
+            // Stagger delay based on siblings
+            const parent = el.parentElement;
+            const siblings = parent ? Array.from(parent.children).filter(
+                child => child.classList.contains(el.classList[0])
+            ) : [];
+            const siblingIndex = siblings.indexOf(el);
+            const delay = siblingIndex >= 0 ? siblingIndex * 0.1 : 0;
+
+            el.style.transitionDelay = `${delay}s`;
             el.classList.add('active');
         }
     });
 };
 
-// Add reveal classes via JS to keep HTML clean
 revealElements.forEach(el => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'all 0.8s ease-out';
+    el.style.transform = 'translateY(25px)';
+    el.style.transition = 'opacity 0.7s ease-out, transform 0.7s ease-out';
 });
 
-// Update styles for active reveal
 const style = document.createElement('style');
 style.innerHTML = `
-    .reveal.active, .stat-card.active, .skill-category.active, .timeline-item.active, .project-card.active {
+    .reveal.active, .stat-card.active, .skill-category.active, 
+    .timeline-item.active, .project-card.active, .contact-item.active,
+    .info-item.active {
         opacity: 1 !important;
         transform: translateY(0) !important;
     }
@@ -103,14 +112,13 @@ menuBtn.addEventListener('click', () => {
     const icon = menuBtn.querySelector('i');
     if (navLinks.classList.contains('active')) {
         icon.classList.replace('fa-bars', 'fa-times');
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
+        document.body.style.overflow = 'hidden';
     } else {
         icon.classList.replace('fa-times', 'fa-bars');
         document.body.style.overflow = '';
     }
 });
 
-// Close mobile menu when a link is clicked
 navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
         navLinks.classList.remove('active');
@@ -119,10 +127,18 @@ navLinks.querySelectorAll('a').forEach(link => {
     });
 });
 
-// Particle Effect
+// Particle Effect — Purple/Pink palette
 const canvas = document.getElementById('hero-particles');
 const ctx = canvas.getContext('2d');
 let particles = [];
+
+const particleColors = [
+    'rgba(168, 85, 247,',   // purple
+    'rgba(236, 72, 153,',   // pink
+    'rgba(192, 132, 252,',  // light purple
+    'rgba(244, 114, 182,',  // light pink
+    'rgba(251, 146, 60,',   // orange accent
+];
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -140,10 +156,11 @@ class Particle {
     reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 - 0.5;
-        this.opacity = Math.random() * 0.5 + 0.2;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedX = Math.random() * 0.6 - 0.3;
+        this.speedY = Math.random() * 0.6 - 0.3;
+        this.opacity = Math.random() * 0.4 + 0.1;
+        this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
     }
 
     update() {
@@ -156,7 +173,7 @@ class Particle {
     }
 
     draw() {
-        ctx.fillStyle = `rgba(0, 210, 255, ${this.opacity})`;
+        ctx.fillStyle = `${this.color} ${this.opacity})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -164,13 +181,34 @@ class Particle {
 }
 
 function initParticles() {
-    for (let i = 0; i < 70; i++) {
+    const count = window.innerWidth < 768 ? 35 : 60;
+    for (let i = 0; i < count; i++) {
         particles.push(new Particle());
     }
 }
 
 function animateParticles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw connecting lines
+    for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 120) {
+                const opacity = (1 - distance / 120) * 0.08;
+                ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+            }
+        }
+    }
+
     particles.forEach(p => {
         p.update();
         p.draw();
@@ -180,23 +218,40 @@ function animateParticles() {
 
 // Counter Animation
 const stats = document.querySelectorAll('.stat-card h3');
-const animateStats = () => {
-    stats.forEach(stat => {
-        const target = parseFloat(stat.textContent);
-        const suffix = stat.textContent.includes('+') ? '+' : '';
-        let count = 0;
-        const speed = target / 50;
+let statsAnimated = false;
 
-        const updateCount = () => {
-            if (count < target) {
-                count += speed;
-                stat.innerText = Math.floor(count) + suffix;
-                setTimeout(updateCount, 20);
+const animateStats = () => {
+    if (statsAnimated) return;
+    statsAnimated = true;
+
+    stats.forEach(stat => {
+        const text = stat.textContent;
+        const target = parseFloat(text);
+        const suffix = text.includes('+') ? '+' : '';
+        const isDecimal = text.includes('.');
+        let count = 0;
+        const duration = 1500;
+        const startTime = performance.now();
+
+        const updateCount = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            count = easeOut * target;
+
+            if (isDecimal) {
+                stat.innerText = count.toFixed(2) + suffix;
             } else {
-                stat.innerText = target + suffix;
+                stat.innerText = Math.floor(count) + suffix;
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCount);
+            } else {
+                stat.innerText = (isDecimal ? target.toFixed(2) : target) + suffix;
             }
         };
-        updateCount();
+        requestAnimationFrame(updateCount);
     });
 };
 
@@ -207,7 +262,7 @@ const statsObserver = new IntersectionObserver((entries) => {
             statsObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.5 });
+}, { threshold: 0.3 });
 
 const aboutSection = document.querySelector('#about');
 if (aboutSection) statsObserver.observe(aboutSection);
@@ -261,25 +316,40 @@ if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const btn = contactForm.querySelector('button');
-        const originalText = btn.textContent;
+        const originalHTML = btn.innerHTML;
 
-        // Simulate sending
         btn.disabled = true;
-        btn.textContent = 'Sending...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
         setTimeout(() => {
-            btn.textContent = 'Message Sent!';
-            btn.style.background = '#27ae60';
+            btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+            btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
             contactForm.reset();
 
             setTimeout(() => {
                 btn.disabled = false;
-                btn.textContent = originalText;
+                btn.innerHTML = originalHTML;
                 btn.style.background = '';
             }, 3000);
         }, 1500);
     });
 }
+
+// Smooth anchor scrolling with offset
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            const offset = 80;
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
